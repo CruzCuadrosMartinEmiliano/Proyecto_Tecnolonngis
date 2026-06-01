@@ -1,0 +1,203 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #003566;
+    color: white;
+}
+.container{
+    width: 64rem;
+    height: 40rem;
+    border-radius: 0.3rem;
+    background-color: #000814;
+    display: flex;
+    justify-content: space-between;
+    overflow: hidden;
+
+}
+.form-container{
+    
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 1.2rem;
+}
+.form-container .form-top{
+    
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-left: 0.9rem;
+    position: relative;
+}
+.form-container .form-top span::before{
+    content: '';
+    position: absolute;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background-color: rgb(255, 255, 255);
+    top: 50%;
+    left: -0.7rem;
+    transform: translateY(-50%);
+
+}
+.form-container .form-bot{
+    
+    font-size: 0.6rem;
+    font-weight: 600;
+    opacity: 0.4;
+}
+.form{
+    border-radius: 2px solid white;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+.login, .register {
+
+width: 55%;
+position: absolute;
+top: 50%;
+
+}
+.login{
+    transform: translateY(-50%);
+    transition: transform 0.8s,opacity 0.8s;
+    opacity: 1;
+}
+.form.toggle .login{
+    transform: translateY(-170%);
+    opacity: 0;
+
+}
+.register{
+    transform: translateY(100%);
+    transition: transform 0.8s,opacity 0.8s;
+    opacity: 0;
+}
+.form.toggle .register{
+    transform: translateY(-50%);
+    opacity: 1;
+}
+
+
+.form h2{
+    font-weight: 600;
+    font-size: 1.5rem;
+    margin-bottom: 0.8rem;
+}
+.form p{
+    font-size: 0.8rem;
+    margin-bottom: 1.8rem;
+}
+.form .input{
+    display:flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin: 0.9rem;
+}
+.form .input label{
+    font-size: 0.7rem;
+    font-weight: 600;
+
+}
+.form .input input{
+    font-size: 0.7rem;
+    outline: none;
+    border: none;
+    border: 1px solid #FFD60A;
+    border-radius: 0.2rem;
+    padding: 0.5rem;
+}
+.form .reminder{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+.form .checkbox-container{
+font-size: 0.7rem;
+font-weight: 600;
+display: flex;
+align-items: center;
+gap: 0.2rem;
+}
+.form .forgot{
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: #FFD60A;
+}
+.form .buttons{
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+}
+.form .buttons button{
+    width: 100%;
+    padding: 0.7rem;
+    font-size: 0.8rem;
+    border-radius: 0.5rem;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+.form .buttons .icon-google{
+    width: 1rem;
+}
+.form .buttons button:first-child{
+    background-color:#219EBC;
+    color: white;
+}
+.form .buttons button:last-child{
+    background-color: #8ECAE6;
+}
+.form .account{
+    text-align: center;
+    font-size: 0.75rem;
+}
+.banner{
+    background-color: #023047;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+.circle{
+    background-color: #FB8500;
+    width: 10rem;
+    height: 10rem;
+    border-radius: 50%;
+}
+.circle-2{
+    width: 16rem;
+    height: 16rem;
+    background-color:rgba(214, 218, 34, 0.2) ;
+    border-radius: 50%;
+    position: absolute;
+    backdrop-filter: blur(8px);
+    clip-path: inset(50% 0 0 0 );
+    transition: clip-path 0.8s ease-in-out;
+}
+.banner.toggle .circle-2{
+        clip-path: inset(0 0 50% 0 );
+
+}
