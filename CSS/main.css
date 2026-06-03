@@ -36,7 +36,7 @@ nav:hover {
 .links {
     display: flex;
     justify-content: center;
-    gap: 30px; /* espacio entre los links */
+    gap: 80px; /* espacio entre los links */
     flex: 1; /* ocupa el espacio central */
 }
 
