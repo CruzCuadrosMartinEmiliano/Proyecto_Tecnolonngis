@@ -173,31 +173,65 @@ gap: 0.2rem;
     text-align: center;
     font-size: 0.75rem;
 }
-.banner{
-    background-color: #023047;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
+.banner {
+  background-color: #023047;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  gap: 2rem;
 }
-.circle{
-    background-color: #FB8500;
-    width: 10rem;
-    height: 10rem;
-    border-radius: 50%;
-}
-.circle-2{
-    width: 16rem;
-    height: 16rem;
-    background-color:rgba(214, 218, 34, 0.2) ;
-    border-radius: 50%;
-    position: absolute;
-    backdrop-filter: blur(8px);
-    clip-path: inset(50% 0 0 0 );
-    transition: clip-path 0.8s ease-in-out;
-}
-.banner.toggle .circle-2{
-        clip-path: inset(0 0 50% 0 );
 
+.circles {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4rem; /* separa los círculos del botón */
+}
+
+.circle {
+  background-color: #FB8500;
+  width: 10rem;
+  height: 10rem;
+  border-radius: 50%;
+  z-index: 2;
+}
+
+.circle-2 {
+  width: 16rem;
+  height: 16rem;
+  background-color: rgba(206, 209, 27, 0.1);
+  border-radius: 50%;
+  position: absolute;
+  backdrop-filter: blur(8px);
+  clip-path: inset(50% 0 0 0);
+  transition: clip-path 0.8s ease-in-out;
+  z-index: 1;
+}
+.banner.toggle .circle-2 {
+  clip-path: inset(0 0 50% 0);
+}
+
+
+.btn-return a {
+  display: inline-block;
+  width: 12rem;
+  height: 3rem;
+  background-color: #8ECAE6;
+  border-radius: 0.5rem;
+  text-align: center;
+  line-height: 3rem;
+  font-weight: 600;
+  color: #000814;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-return a:hover {
+  background-color: #219EBC;
+  color: white;
+  transform: scale(1.05);
 }
