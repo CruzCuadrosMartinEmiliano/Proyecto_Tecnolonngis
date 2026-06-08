@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión Integral - TechnolonngisB</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            black: '#000814',      /* Ink Black */
+                            prussian: '#001D3D',   /* Prussian Blue */
+                            navy: '#003566',       /* Regal Navy */
+                            yellow: '#FFC300',     /* School Bus Yellow */
+                            gold: '#FFD60A',       /* Gold */
+                            entradas: '#38bdf8',
+                            salidas: '#06b6d4'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #001D3D; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #003566; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #FFC300; }
+    </style>
+</head>
+<body class="bg-brand-black text-slate-100 font-sans antialiased min-h-screen custom-scrollbar">
+
+    <div class="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+        
+        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-brand-navy pb-4 gap-2">
+            <div>
+                <h1 class="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+                    <span class="text-brand-gold">⚙️</span> Inventario
+                </h1>
+                <p class="text-sm text-slate-400 font-medium">Sistema de Gestión Integral</p>
+            </div>
+            <div class="text-left sm:text-right bg-brand-prussian/50 p-2.5 rounded-lg border border-brand-navy">
+                <p class="text-[10px] text-brand-gold uppercase tracking-wider font-bold">Última actualización</p>
+                <p class="text-xs font-semibold text-white">27 Feb 2026, 14:35</p>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-brand-prussian p-4 rounded-xl border border-brand-navy shadow-lg transition hover:border-brand-yellow/40">
+                <div class="flex justify-between items-start">
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Productos Totales</p>
+                    <span class="text-xs font-bold bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded-full">+12%</span>
+                </div>
+                <p class="text-3xl font-bold text-white mt-2">2,847</p>
+            </div>
+            <div class="bg-brand-prussian p-4 rounded-xl border border-brand-navy shadow-lg transition hover:border-brand-yellow/40">
+                <div class="flex justify-between items-start">
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Valor del Inventario</p>
+                    <span class="text-xs font-bold bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded-full">+8.5%</span>
+                </div>
+                <p class="text-3xl font-bold text-white mt-2">$1.24M</p>
+            </div>
+            <div class="bg-brand-prussian p-4 rounded-xl border border-brand-navy shadow-lg transition hover:border-brand-yellow border-l-4 border-l-rose-500 cursor-pointer" onclick="filtrarPorEstado('Crítico')">
+                <div class="flex justify-between items-start">
+                    <p class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Stock Crítico</p>
+                    <span class="text-xs font-bold bg-rose-950 text-rose-400 px-2 py-0.5 rounded-full">-5</span>
+                </div>
+                <p class="text-3xl font-bold text-rose-500 mt-2">23</p>
+            </div>
+            <div class="bg-brand-prussian p-4 rounded-xl border border-brand-navy shadow-lg transition hover:border-brand-yellow border-l-4 border-l-brand-yellow cursor-pointer" onclick="filtrarPorEstado('Por Caducar')">
+                <div class="flex justify-between items-start">
+                    <p class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Próx. a Caducar</p>
+                    <span class="text-xs font-bold bg-amber-950/80 text-brand-gold px-2 py-0.5 rounded-full">+3</span>
+                </div>
+                <p class="text-3xl font-bold text-brand-gold mt-2">47</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="bg-brand-prussian p-5 rounded-xl border border-brand-navy shadow-md lg:col-span-2 flex flex-col justify-between">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
+                    <div>
+                        <h2 class="font-bold text-white text-base">Movimientos de Inventario</h2>
+                        <p class="text-xs text-slate-400">Entradas vs Salidas semanales</p>
+                    </div>
+                    <div class="flex bg-brand-black p-1 rounded-lg text-xs font-medium border border-brand-navy">
+                        <button class="px-3 py-1 bg-brand-navy text-white rounded-md shadow-sm">7 días</button>
+                        <button class="px-3 py-1 text-slate-400 hover:text-white transition" onclick="alert('Historial de 30 días cargando en servidor...')">30 días</button>
+                    </div>
+                </div>
+                <div class="h-56 relative">
+                    <canvas id="chartMovimientos"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-brand-prussian p-5 rounded-xl border border-brand-navy shadow-md flex flex-col">
+                <div class="mb-4">
+                    <h2 class="font-bold text-white text-base flex items-center gap-2">
+                        <i data-lucide="bell" class="w-4 h-4 text-brand-gold"></i> Alertas Recientes
+                    </h2>
+                </div>
+                <div class="space-y-3 overflow-y-auto max-h-56 pr-1 flex-1 custom-scrollbar" id="panelAlertas">
+                    </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+            
+            <div class="bg-brand-prussian rounded-xl border border-brand-navy shadow-md overflow-hidden lg:col-span-2">
+                <div class="p-4 border-b border-brand-navy bg-brand-black/30 space-y-3">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <h3 class="font-bold text-white flex items-center gap-2 text-sm">
+                            Tienda 3B <span class="text-xs font-normal text-slate-400" id="totalProductosTxt"></span>
+                        </h3>
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <div class="relative flex-1 sm:flex-none">
+                                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5"></i>
+                                <input type="text" id="inputBuscar" oninput="buscarProducto()" placeholder="Buscar producto, SKU o marca..." class="w-full sm:w-60 pl-9 pr-3 py-1.5 bg-brand-black border border-brand-navy rounded-lg text-xs text-white focus:outline-none focus:border-brand-yellow transition">
+                            </div>
+                            <button onclick="exportarCSV()" class="flex items-center justify-center gap-1.5 bg-brand-navy border border-brand-navy rounded-lg px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-brand-black hover:text-brand-gold transition shadow-sm">
+                                <i data-lucide="download" class="w-3.5 h-3.5"></i> Exportar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5 text-xs">
+                        <button onclick="filtrarPorEstado('Todos')" id="btnFiltroTodos" class="px-3 py-1 rounded-full font-medium bg-brand-yellow text-brand-black shadow-md transition">Todos</button>
+                        <button onclick="filtrarPorEstado('Óptimo')" id="btnFiltroOptimo" class="px-3 py-1 rounded-full font-medium bg-brand-black text-slate-400 border border-brand-navy hover:border-emerald-500 hover:text-emerald-400 transition">Óptimo</button>
+                        <button onclick="filtrarPorEstado('Por Caducar')" id="btnFiltroPorCaducar" class="px-3 py-1 rounded-full font-medium bg-brand-black text-slate-400 border border-brand-navy hover:border-brand-gold hover:text-brand-gold transition">Por Caducar</button>
+                        <button onclick="filtrarPorEstado('Urgente')" id="btnFiltroUrgente" class="px-3 py-1 rounded-full font-medium bg-brand-black text-slate-400 border border-brand-navy hover:border-orange-500 hover:text-orange-400 transition">Urgente</button>
+                        <button onclick="filtrarPorEstado('Crítico')" id="btnFiltroCritico" class="px-3 py-1 rounded-full font-medium bg-brand-black text-slate-400 border border-brand-navy hover:border-rose-500 hover:text-rose-400 transition">Crítico</button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-brand-black/60 border-b border-brand-navy text-slate-300 font-semibold uppercase tracking-wider sticky top-0">
+                                <th class="p-3">Producto</th>
+                                <th class="p-3">SKU</th>
+                                <th class="p-3">Categoría</th>
+                                <th class="p-3 text-right">Precio</th>
+                                <th class="p-3 text-center">Stock</th>
+                                <th class="p-3 text-center">Caducidad</th>
+                                <th class="p-3 text-center">Estado</th>
+                                <th class="p-3 text-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-brand-navy/40 text-slate-300" id="cuerpoTabla">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="panelDetalle" class="bg-brand-prussian p-5 rounded-xl border border-brand-navy shadow-md space-y-4 sticky top-6">
+                </div>
+        </div>
+
+        <div class="bg-brand-prussian p-5 rounded-xl border border-brand-navy shadow-md">
+            <div class="mb-4">
+                <h2 class="font-bold text-white text-base">Valor del Inventario en el Tiempo</h2>
+                <p class="text-xs text-slate-400">Histórico de valuación financiera mensual corporativa</p>
+            </div>
+            <div class="h-64 relative">
+                <canvas id="chartHistorico"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Carga de la Base de Datos oficial del documento corporativo
+        const dbProductos = [
+            { id: 1, nombre: "Leche Entera 1L", sku: "LAC-001", categoria: "Lácteos", marca: "Alpura", precioVenta: 28.50, precioCompra: 18.50, stockActual: 8, stockMin: 20, stockMax: 150, caducidad: "15 Mar 2026", diasRestantes: "16 días", lote: "LE-240228-A", estado: "Crítico", desc: "Leche entera pasteurizada de 1 litro. Producto lácteo fresco de alta calidad." },
+            { id: 2, nombre: "Arroz 1kg", sku: "GRA-102", categoria: "Granos Básicos", marca: "Verde Valle", precioVenta: 35.00, precioCompra: 22.00, stockActual: 245, stockMin: 50, stockMax: 500, caducidad: "20 Dic 2026", diasRestantes: "296 días", lote: "AR-251102-B", estado: "Óptimo", desc: "Arroz súper extra seleccionado de grano largo." },
+            { id: 3, nombre: "Queso Oaxaca 400g", sku: "LAC-045", categoria: "Lácteos", marca: "Aurrera", precioVenta: 88.00, precioCompra: 58.00, stockActual: 32, stockMin: 30, stockMax: 100, caducidad: "04 Mar 2026", diasRestantes: "5 días", lote: "QF-240218", estado: "Por Caducar", desc: "Queso oaxaca fresco hebrado listo para fundir." },
+            { id: 4, nombre: "Agua Natural 1.5L", sku: "BEB-201", categoria: "Bebidas", marca: "Skarch", precioVenta: 18.50, precioCompra: 9.00, stockActual: 520, stockMin: 100, stockMax: 600, caducidad: "15 Ago 2026", diasRestantes: "169 días", lote: "AG-260110-A", estado: "Óptimo", desc: "Agua purificada libre de sodio embotellada de origen." },
+            { id: 5, nombre: "Yogurt Natural 1kg", sku: "LAC-089", categoria: "Lácteos", marca: "Yoplait", precioVenta: 52.00, precioCompra: 34.00, stockActual: 45, stockMin: 40, stockMax: 120, caducidad: "02 Mar 2026", diasRestantes: "3 días", lote: "YN-240220", estado: "Urgente", desc: "Yogurt natural cremoso sin azúcar añadida." },
+            { id: 6, nombre: "Galletas Chocolate", sku: "PAN-312", categoria: "Panadería", marca: "Marinela", precioVenta: 35.00, precioCompra: 23.00, stockActual: 178, stockMin: 60, stockMax: 300, caducidad: "25 Jun 2026", diasRestantes: "118 días", lote: "GC-251215-C", estado: "Óptimo", desc: "Galletas con chispas de chocolate crujientes." },
+            { id: 7, nombre: "Aceite Vegetal 1L", sku: "COC-156", categoria: "Cocina", marca: "Nutrioli", precioVenta: 42.50, precioCompra: 28.00, stockActual: 95, stockMin: 80, stockMax: 200, caducidad: "10 Oct 2026", diasRestantes: "225 días", lote: "AV-250918-A", estado: "Óptimo", desc: "Aceite vegetal puro ideal para guisar y freír de forma sana." }
+        ];
+
+        let filtroEstadoActual = "Todos";
+        let terminoBusqueda = "";
+        let productoSeleccionadoId = 1;
+
+        // Renderizado de tabla dinámico con filtros cruzados
+        function renderTabla() {
+            const cuerpo = document.getElementById("cuerpoTabla");
+            cuerpo.innerHTML = "";
+
+            const filtered = dbProductos.filter(p => {
+                const matchEstado = (filtroEstadoActual === "Todos" || p.estado === filtroEstadoActual);
+                const matchBusqueda = p.nombre.toLowerCase().includes(terminoBusqueda) || 
+                                      p.sku.toLowerCase().includes(terminoBusqueda) || 
+                                      p.marca.toLowerCase().includes(terminoBusqueda);
+                return matchEstado && matchBusqueda;
+            });
+
+            document.getElementById("totalProductosTxt").innerText = `(${filtered.length} de 2,847 registrados)`;
+
+            filtered.forEach(p => {
+                const totalFinanciero = (p.precioVenta * p.stockActual).toFixed(2);
+                let badgeColor = "";
+                
+                if (p.estado === "Crítico") badgeColor = "bg-rose-950 text-rose-400 border border-rose-800";
+                else if (p.estado === "Urgente") badgeColor = "bg-orange-950 text-orange-400 border border-orange-800";
+                else if (p.estado === "Por Caducar") badgeColor = "bg-amber-950 text-brand-gold border border-amber-700";
+                else badgeColor = "bg-emerald-950 text-emerald-400 border border-emerald-800";
+
+                const isSelected = p.id === productoSeleccionadoId ? 'bg-brand-navy/60 border-l-4 border-l-brand-gold' : 'hover:bg-brand-navy/20';
+
+                const tr = `
+                    <tr class="cursor-pointer transition ${isSelected}" onclick="seleccionarProducto(${p.id})">
+                        <td class="p-3 text-white font-medium">${p.nombre}</td>
+                        <td class="p-3 text-slate-400 font-mono">${p.sku}</td>
+                        <td class="p-3 text-slate-400">${p.categoria}</td>
+                        <td class="p-3 text-right font-mono">$${p.precioVenta.toFixed(2)}</td>
+                        <td class="p-3 text-center">
+                            <span class="font-bold ${p.estado === 'Crítico' ? 'text-rose-400' : 'text-white'}">${p.stockActual}</span>
+                            <span class="text-[10px] text-slate-500 block">Mín: ${p.stockMin}</span>
+                        </td>
+                        <td class="p-3 text-center">
+                            <span>${p.caducidad}</span>
+                            <span class="text-[10px] text-slate-500 block">${p.diasRestantes}</span>
+                        </td>
+                        <td class="p-3 text-center">
+                            <span class="inline-block px-2 py-0.5 rounded-full font-medium text-[10px] ${badgeColor}">${p.estado}</span>
+                        </td>
+                        <td class="p-3 text-right font-semibold font-mono text-white">$${Number(totalFinanciero).toLocaleString()}</td>
+                    </tr>
+                `;
+                cuerpo.insertAdjacentHTML("beforeend", tr);
+            });
+        }
+
+        // Ficha técnica del panel de detalles interactivo
+        function renderDetalle() {
+            const panel = document.getElementById("panelDetalle");
+            const prod = dbProductos.find(p => p.id === productoSeleccionadoId) || dbProductos[0];
+            const margen = (((prod.precioVenta - prod.precioCompra) / prod.precioVenta) * 100).toFixed(1);
+
+            panel.innerHTML = `
+                <div class="border-b border-brand-navy pb-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] bg-brand-black text-brand-gold border border-brand-navy px-2 py-0.5 rounded font-mono font-bold">SKU: ${prod.sku}</span>
+                        <span class="text-xs text-slate-400 font-medium">${prod.marca}</span>
+                    </div>
+                    <h3 class="text-base font-bold text-white mt-1">${prod.nombre}</h3>
+                </div>
+                
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <h4 class="text-[10px] text-brand-gold uppercase font-bold tracking-wider mb-1">Descripción</h4>
+                        <p class="text-slate-300 leading-relaxed bg-brand-black/40 p-2 rounded border border-brand-navy">${prod.desc}</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 bg-brand-black/40 p-2.5 rounded-lg border border-brand-navy">
+                        <div>
+                            <p class="text-[10px] text-slate-400 font-medium">Precio Compra</p>
+                            <p class="font-bold text-white font-mono">$${prod.precioCompra.toFixed(2)}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-slate-400 font-medium">Precio Venta</p>
+                            <p class="font-bold text-white font-mono">$${prod.precioVenta.toFixed(2)}</p>
+                        </div>
+                        <div class="col-span-2 pt-1.5 border-t border-brand-navy flex justify-between items-center">
+                            <span class="text-[10px] font-medium text-slate-400">Margen:</span>
+                            <span class="font-mono font-bold text-emerald-400">${margen}%</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <h4 class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Control de Existencias</h4>
+                        <div class="flex justify-between items-center bg-brand-black/20 p-2 border border-brand-navy rounded">
+                            <span class="text-slate-400">Stock Actual:</span>
+                            <span class="font-bold ${prod.stockActual <= prod.stockMin ? 'text-rose-400' : 'text-white'}">${prod.stockActual} unidades</span>
+                        </div>
+                        ${prod.stockActual <= prod.stockMin ? `<p class="text-[10px] font-bold text-rose-400 flex items-center gap-1"><i data-lucide="alert-triangle" class="w-3 h-3"></i> ¡Por debajo del mínimo establecido!</p>` : ''}
+                        <div class="grid grid-cols-2 gap-2 text-[10px] text-slate-400">
+                            <div>Mínimo: <b class="text-slate-200">${prod.stockMin} ud</b></div>
+                            <div class="text-right">Máximo: <b class="text-slate-200">${prod.stockMax} ud</b></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-brand-navy text-white p-3 rounded-lg space-y-1 border border-brand-yellow/20">
+                        <div class="flex justify-between text-[10px] text-brand-gold font-bold uppercase">
+                            <span>Información de Lote</span>
+                            <span>${prod.estado}</span>
+                        </div>
+                        <div class="flex justify-between pt-1">
+                            <span>Lote: <b class="font-mono">${prod.lote}</b></span>
+                            <span class="font-medium text-slate-200">${prod.diasRestantes} rest.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex gap-2">
+                    <button onclick="alert('Abriendo editor para SKU: ${prod.sku}')" class="flex-1 bg-brand-navy border border-brand-navy hover:bg-brand-black text-slate-200 font-medium py-1.5 rounded-lg text-xs transition flex items-center justify-center gap-1">
+                        <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Editar
+                    </button>
+                    <button onclick="alert('Orden de reordenamiento automático generada exitosamente.')" class="flex-1 bg-brand-yellow hover:bg-brand-gold text-brand-black font-bold py-1.5 rounded-lg text-xs transition flex items-center justify-center gap-1 shadow-md">
+                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Reordenar
+                    </button>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        // Panel lateral de alertas oficiales
+        function renderAlertas() {
+            const panel = document.getElementById("panelAlertas");
+            panel.innerHTML = "";
+
+            const alertas = [
+                { tipo: "Crítico", titulo: "Stock Bajo: Leche Entera 1L", desc: "Quedan 8 unidades • Mín: 20", tiempo: "Hace 5m", pId: 1 },
+                { tipo: "Urgente", titulo: "Caduca en 3 días: Yogurt Natural", desc: "Lote: YN-240220 • 45 unidades", tiempo: "Hace 12m", pId: 5 },
+                { tipo: "Ingreso", titulo: "Nuevo ingreso: Arroz 1kg", desc: "+200 unidades • Proveedor: GranoSA", tiempo: "Hace 1h", pId: 2 },
+                { tipo: "Por Caducar", titulo: "Caduca en 5 días: Queso Oaxaca", desc: "Lote: QF-240218 • 32 unidades", tiempo: "Hace 2h", pId: 3 }
+            ];
+
+            alertas.forEach(a => {
+                let badgeClass = "text-slate-200";
+                if(a.tipo === "Crítico") badgeClass = "text-rose-400 font-bold";
+                if(a.tipo === "Urgente") badgeClass = "text-orange-400 font-bold";
+                if(a.tipo === "Por Caducar") badgeClass = "text-brand-gold font-bold";
+                if(a.tipo === "Ingreso") badgeClass = "text-emerald-400 font-bold";
+
+                const html = `
+                    <div class="flex justify-between items-start text-xs border-b border-brand-navy/40 pb-2 hover:bg-brand-black/40 p-1.5 rounded transition cursor-pointer" onclick="seleccionarProducto(${a.pId})">
+                        <div>
+                            <p class="${badgeClass}">${a.titulo}</p>
+                            <p class="text-slate-400 text-[11px]">${a.desc}</p>
+                        </div>
+                        <span class="text-slate-500 text-[10px] whitespace-nowrap pl-1">${a.tiempo}</span>
+                    </div>
+                `;
+                panel.insertAdjacentHTML("beforeend", html);
+            });
+        }
+
+        function seleccionarProducto(id) {
+            productoSeleccionadoId = id;
+            renderTabla();
+            renderDetalle();
+        }
+
+        function buscarProducto() {
+            terminoBusqueda = document.getElementById("inputBuscar").value.toLowerCase();
+            renderTabla();
+        }
+
+        function filtrarPorEstado(estado) {
+            filtroEstadoActual = estado;
+            
+            ["Todos", "Óptimo", "Por Caducar", "Urgente", "Crítico"].forEach(est => {
+                const mapaIds = {
+                "Todos": "btnFiltroTodos",
+                "Óptimo": "btnFiltroOptimo",
+                "Por Caducar": "btnFiltroPorCaducar",
+                "Urgente": "btnFiltroUrgente",
+                "Crítico": "btnFiltroCritico"
+            };
+            const btn = document.getElementById(mapaIds[est]);
+                if (est === estado) {
+                    btn.className = "px-3 py-1 rounded-full font-medium bg-brand-yellow text-brand-black shadow-md transition";
+                } else {
+                    btn.className = "px-3 py-1 rounded-full font-medium bg-brand-black text-slate-400 border border-brand-navy hover:text-white transition";
+                }
+            });
+            renderTabla();
+        }
+
+        function exportarCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,Producto,SKU,Categoria,Precio,Stock,Estado,Valuacion\n";
+            dbProductos.forEach(p => {
+                csvContent += `"${p.nombre}","${p.sku}","${p.categoria}",${p.precioVenta},${p.stockActual},"${p.estado}",${(p.precioVenta * p.stockActual).toFixed(2)}\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Reporte_TechnolonngisB_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // CONTROL DE GRÁFICOS (CHART.JS) CONFIGURADOS CON LA PALETA CORPORATIVA
+        function inicializarGraficas() {
+            // Gráfico de Barras Semanal (Entradas / Salidas)
+            const ctxMov = document.getElementById('chartMovimientos').getContext('2d');
+            new Chart(ctxMov, {
+                type: 'bar',
+                data: {
+                    labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+                    datasets: [
+                        { label: 'Entradas', data: [320, 450, 380, 520, 410, 290, 340], backgroundColor: '#38bdf8', borderRadius: 4 },
+                        { label: 'Salidas', data: [280, 390, 420, 380, 460, 510, 380], backgroundColor: '#06b6d4', borderRadius: 4 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { labels: { color: '#cbd5e1', font: { size: 11 } } },
+                        tooltip: { backgroundColor: '#001D3D', titleColor: '#FFD60A', borderColor: '#003566', borderWidth: 1 }
+                    },
+                    scales: {
+                        y: { grid: { color: '#003566' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 10 } } }
+                    }
+                }
+            });
+
+            // Gráfico Histórico de Línea (Valor de Inventario)
+            const ctxHist = document.getElementById('chartHistorico').getContext('2d');
+            new Chart(ctxHist, {
+                type: 'line',
+                data: {
+                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                    datasets: [{
+                        label: 'Valor Total ($M)',
+                        data: [0.98, 1.02, 1.10, 1.05, 1.15, 1.18, 1.12, 1.20, 1.19, 1.22, 1.24, 1.25],
+                        borderColor: '#FFD60A',
+                        backgroundColor: 'rgba(255, 214, 10, 0.05)',
+                        fill: true,
+                        tension: 0.25,
+                        pointBackgroundColor: '#FFC300',
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: { backgroundColor: '#001D3D', titleColor: '#FFD60A' }
+                    },
+                    scales: {
+                        y: { min: 0, max: 1.4, ticks: { callback: value => '$' + value.toFixed(2) + 'M', color: '#94a3b8', font: { size: 10 } }, grid: { color: '#003566' } },
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        // ARRANCAR CONTROLADOR DE INTERFAZ
+        window.onload = () => {
+            renderTabla();
+            renderDetalle();
+            renderAlertas();
+            inicializarGraficas();
+            lucide.createIcons();
+        };
+    </script>
+</body>
+</html>
