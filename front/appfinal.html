@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADMINISTRATECH - Control de Inventario</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-logo">📦</div>
+                <h1>ADMINISTRATECH</h1>
+            </div>
+            
+            <nav>
+    <ul class="sidebar-menu">
+        <li>
+            <a href="#" onclick="solicitarAccesoVista('view-inventario')" class="active" id="lnk-inventario">
+                <div class="nav-icon">📊</div>
+                <span>Inventario (I)</span>
+            </a>
+        </li>
+        <li>
+            <a href="#" onclick="solicitarAccesoVista('view-ventas')" id="lnk-ventas">
+                <div class="nav-icon">🛒</div>
+                <span>Ventas Rápidas</span>
+            </a>
+        </li>
+        <li>
+            <a href="#" onclick="solicitarAccesoVista('view-productos')" id="lnk-productos">
+                <div class="nav-icon">📦</div>
+                <span>Productos (P)</span>
+            </a>
+        </li>
+        <li>
+            <a href="#" onclick="solicitarAccesoVista('view-ganancias')" id="lnk-ganancias">
+                <div class="nav-icon">💰</div>
+                <span>Ganancias (G)</span>
+            </a>
+        </li>
+        <li>
+            <a href="#" onclick="solicitarAccesoVista('view-configuracion')" id="lnk-configuracion">
+                <div class="nav-icon">⚙️</div>
+                <span>Configuración</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+            
+            <div class="sidebar-footer">
+                <p>Versión 1.3.0 - Grupo 4IV8</p>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            
+            <div class="notification-bar">
+                <div class="notif-bell-container" onclick="toggleNotifPanel()">
+                    <span class="bell-icon">🔔</span>
+                    <span id="notif-badge" class="notif-badge" style="display: none;">0</span>
+                </div>
+                <div id="notif-panel" class="notif-panel">
+                    <h4>Alertas del Sistema</h4>
+                    <div id="notif-list"></div>
+                </div>
+            </div>
+
+            <div id="view-inventario" class="app-view active">
+                <div class="view-header">
+                    <div>
+                        <h2>Control de Inventario</h2>
+                        <p class="subtitle">Gestión física, estados de stock y catálogos de la tienda</p>
+                    </div>
+                    <div class="counter-badge">
+                        Total Productos: <span id="total-count-label">0</span>
+                    </div>
+                </div>
+
+                <div class="actions-bar">
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="txt-buscar" oninput="filtrarProductos()" placeholder="Buscar por nombre o código SKU...">
+                    </div>
+                    <button class="btn btn-primary" onclick="openModal('modal-producto')">➕ Agregar Producto</button>
+                </div>
+
+                <div class="table-container">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Código SKU</th>
+                                <th>Descripción del Producto</th>
+                                <th>Categoría</th>
+                                <th>Stock Físico</th>
+                                <th>Costo Compra</th>
+                                <th>Precio Venta</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lista-productos-tabla">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="view-ventas" class="app-view">
+                <div class="view-header">
+                    <div>
+                        <h2>Punto de Venta Rápido</h2>
+                        <p class="subtitle">Despacha productos de forma inmediata y actualiza el stock</p>
+                    </div>
+                </div>
+
+                <div class="actions-bar" style="position: relative;">
+                    <div class="search-box" style="max-width: 450px; flex: 1; position: relative;">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="venta-buscar-producto" oninput="buscarProductoVenta()" placeholder="Escribe nombre o SKU del producto..." autocomplete="off">
+                        <div id="venta-resultados-busqueda" class="dropdown-resultados" style="display: none;"></div>
+                        <input type="hidden" id="venta-id-seleccionado">
+                    </div>
+                    
+                    <div class="form-group" style="flex-direction: row; align-items: center; gap: 0.5rem; margin: 0;">
+                        <label style="margin: 0; white-space: nowrap;">Cantidad:</label>
+                        <input type="number" id="venta-cantidad" value="1" min="0.001" step="any" style="width: 100px; text-align: center;">
+                    </div>
+
+                    <button class="btn btn-primary" onclick="agregarAlCarrito()">➕ Añadir</button>
+                </div>
+
+                <div class="table-container">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Precio Unitario</th>
+                                <th>Cantidad</th>
+                                <th>Subtotal</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cuerpo-tabla-carrito-ventas">
+    </tbody>
+                    </table>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem;">
+                    <div class="checkout-card">
+                        <h3 style="color: var(--text-muted); font-size: 0.85rem; letter-spacing: 1px; margin-bottom: 0.5rem; text-transform: uppercase;">Total a Cobrar</h3>
+                        <span id="venta-total-pago" style="font-size: 2.5rem; font-weight: 800; color: var(--color-yellow); display: block; margin-bottom: 1.5rem;">$0.00</span>
+                        
+                        <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                            <button class="btn btn-secondary" onclick="cancelarVentaActual()">Limpiar</button>
+                            <button class="btn btn-primary" style="background-color: var(--color-success);" onclick="procesarVentaFinal()">💵 Cobrar Venta</button>
+                        </div>
+                    </div>
+                </div>
+            </div> <div id="view-productos" class="app-view">
+                <div class="view-header">
+                    <div>
+                        <h2>Módulo de Productos Detallado</h2>
+                        <p class="subtitle">Buscador avanzado, analítica financiera y control de rotación de stock</p>
+                    </div>
+                </div>
+
+                <div class="actions-bar" style="position: relative;">
+                    <div class="search-box" style="max-width: 450px; flex: 1; position: relative;">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="txt-buscar-detalle" oninput="buscarProductoDetalle()" placeholder="Escribe el nombre o SKU del producto..." autocomplete="off">
+                        <div id="detalle-resultados-busqueda" class="dropdown-resultados" style="display: none;"></div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="limpiarPantallaDetalle()">🔄 Limpiar</button>
+                    <button class="btn btn-secondary" onclick="cerrarSesionModulos()" style="background-color: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); margin-left: auto;">
+    🔒 Bloquear Acceso
+</button>
+                </div>
+
+                <div id="panel-kardex-producto" class="kardex-container">
+                    
+                    <div class="kardex-header">
+                        <div class="counter-badge" style="margin:0;" id="det-header-sku">SKU: ---</div>
+                        <h3 id="det-header-nombre">Nombre del Producto</h3>
+                    </div>
+
+                    <div class="kardex-grid">
+                        
+                        <div class="kardex-panel">
+                            <h4 style="color: var(--color-primary);"><span>ℹ️</span> Información General</h4>
+                            <div class="kardex-group">
+                                <label>Nombre del Producto</label>
+                                <span id="det-info-nombre" style="font-weight: 600;">-</span>
+                            </div>
+                            <div class="kardex-group">
+                                <label>Descripción</label>
+                                <p id="det-info-desc">-</p>
+                            </div>
+                            <div class="kardex-group">
+                                <label>Código SKU</label>
+                                <span id="det-info-sku" style="font-family: monospace; color: var(--color-primary); font-weight: bold;">-</span>
+                            </div>
+                            <div class="kardex-group">
+                                <label>Categoría</label>
+                                <span id="det-info-categoria" class="badge-status" style="background-color: rgba(56,189,248,0.1); color: #38bdf8; border: none; font-size: 0.8rem;">-</span>
+                            </div>
+                            <div class="kardex-group">
+                                <label>Proveedor Principal</label>
+                                <span id="det-info-proveedor">-</span>
+                            </div>
+                        </div>
+
+                        <div class="kardex-center-layout">
+                            <div class="kardex-fin-cards">
+                                <div class="fin-card">
+                                    <span style="color: var(--text-muted); font-size: 0.75rem;">Precio Compra</span>
+                                    <span id="det-fin-compra" class="fin-val">-</span>
+                                </div>
+                                <div class="fin-card">
+                                    <span style="color: var(--text-muted); font-size: 0.75rem;">Precio Venta</span>
+                                    <span id="det-fin-venta" class="fin-val" style="color: var(--color-primary);">-</span>
+                                </div>
+                                <div class="fin-card">
+                                    <span style="color: var(--text-muted); font-size: 0.75rem;">Margen</span>
+                                    <span id="det-fin-margen" class="fin-val" style="color: var(--color-success);">-</span>
+                                </div>
+                            </div>
+                            <div class="kardex-alert-box">
+                                <h4>NOTIFICACIONES IMPORTANTES !!</h4>
+                                <div id="det-contenedor-alertas"></div>
+                            </div>
+                        </div>
+
+                        <div class="kardex-center-layout">
+                            <div class="kardex-panel">
+                                <h4 style="color: var(--color-yellow);"><span>📅</span> Caducidad</h4>
+                                <div class="caducidad-box">
+                                    <span style="color: var(--text-muted); font-size: 0.7rem; display: block; margin-bottom: 2px;">Fecha de Vencimiento</span>
+                                    <span id="det-cad-fecha" style="color: var(--color-yellow); font-weight: 600;">-</span>
+                                </div>
+                                <div id="box-dias-restantes" class="dias-restantes-box">
+                                    <span style="color: var(--text-muted); font-size: 0.7rem; display: block; margin-bottom: 2px;">Días Restantes</span>
+                                    <span id="det-cad-dias" style="font-weight: 700; font-size: 1.1rem;">-</span>
+                                </div>
+                            </div>
+                            <div class="kardex-panel">
+                                <h4 style="color: var(--color-success);"><span>🔄</span> Movimientos Recientes</h4>
+                                <div id="det-lista-movimientos" style="display: flex; flex-direction: column; gap: 0.6rem;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div> <div id="det-estado-inicial" class="card-placeholder" style="margin-top: 1.5rem;">
+                    <div class="lock-icon">📦</div>
+                    <h3>Buscador Analítico Activo</h3>
+                    <p class="subtitle">Ingresa términos clave arriba para inspeccionar los datos financieros y el Kardex del producto.</p>
+                </div>
+
+            </div> <div id="view-ganancias" class="app-view">
+    <div class="view-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div>
+            <h2>Módulo de Ganancias</h2>
+            <p class="subtitle">Análisis de rendimientos, pérdidas por merma y rotación de categorías</p>
+        </div>
+        <button class="btn btn-secondary" onclick="cerrarSesionModulos()" style="background-color: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); font-weight: 600;">
+            🔒 Salir y Bloquear Módulos
+        </button>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+        
+        <div class="fin-card" style="text-align: left; padding: 1.2rem; position: relative;">
+            <span style="color: var(--text-muted); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;">VALOR TOTAL INVENTARIO (VT)</span>
+            <span id="fin-vt" style="color: #ffffff; font-size: 1.6rem; font-weight: 800; display: block; margin-top: 0.4rem;">$0.00</span>
+            <small style="color: var(--text-muted); font-size: 0.7rem; display: block; margin-top: 0.2rem;">Costo total acumulado en almacén</small>
+        </div>
+
+        <div class="fin-card" style="text-align: left; padding: 1.2rem; border-left: 3px solid #ef4444;">
+            <span style="color: #ef4444; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;">PÉRDIDA POR CADUCIDAD (PC)</span>
+            <span id="fin-pc" style="color: #ef4444; font-size: 1.6rem; font-weight: 800; display: block; margin-top: 0.4rem;">$0.00</span>
+            <small style="color: var(--text-muted); font-size: 0.7 stream; display: block; margin-top: 0.2rem;">Mermas por productos vencidos</small>
+        </div>
+
+        <div class="fin-card" style="text-align: left; padding: 1.2rem;">
+            <span style="color: var(--color-success); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;">MÁS VENDIDO (PM)</span>
+            <span id="fin-pm" style="color: #fff; font-size: 1.1rem; font-weight: 700; display: block; margin-top: 0.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Ninguno aún</span>
+            <small id="fin-pm-unid" style="color: var(--text-muted); font-size: 0.7rem; display: block; margin-top: 0.2rem;">0 unidades desplazadas</small>
+        </div>
+
+        <div class="fin-card" style="text-align: left; padding: 1.2rem;">
+            <span style="color: var(--color-yellow); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;">MENOS VENDIDO (PMV)</span>
+            <span id="fin-pmv" style="color: #fff; font-size: 1.1rem; font-weight: 700; display: block; margin-top: 0.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Ninguno aún</span>
+            <small id="fin-pmv-unid" style="color: var(--text-muted); font-size: 0.7rem; display: block; margin-top: 0.2rem;">Sin movimientos</small>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 380px; gap: 1.5rem;">
+        
+        <div class="kardex-panel" style="padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h4 style="margin: 0; font-size: 1rem; color: #fff;">📈 Curva de Ganancias Netas</h4>
+                
+                <div style="display: flex; gap: 0.3rem; background-color: rgba(0,0,0,0.2); padding: 3px; border-radius: 6px; border: 1px solid var(--border-color);">
+                    <button class="btn" onclick="cambiarPeriodoGanancias('semanal')" id="btn-p-semanal" style="padding: 0.3rem 0.8rem; font-size: 0.75rem; margin: 0; background-color: var(--color-primary);">Semanal</button>
+                    <button class="btn" onclick="cambiarPeriodoGanancias('mensual')" id="btn-p-mensual" style="padding: 0.3rem 0.8rem; font-size: 0.75rem; margin: 0; background-color: transparent;">Mensual</button>
+                    <button class="btn" onclick="cambiarPeriodoGanancias('anual')" id="btn-p-anual" style="padding: 0.3rem 0.8rem; font-size: 0.75rem; margin: 0; background-color: transparent;">Anual</button>
+                </div>
+            </div>
+            
+            <div style="position: relative; height: 320px; width: 100%;">
+                <canvas id="chart-linea-ganancias"></canvas>
+            </div>
+        </div>
+
+        <div class="kardex-panel" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
+            <h4 style="margin: 0 0 1rem 0; font-size: 1rem; color: #fff;">🍩 Distribución por Categoría</h4>
+            
+            <div style="position: relative; height: 240px; width: 100%; display: flex; justify-content: center; align-items: center;">
+<canvas id="chart-torta-categorias"></canvas>            </div>
+            
+            <p style="color: var(--text-muted); font-size: 0.7rem; text-align: center; margin: 1rem 0 0 0; line-height: 1.3;">
+                Representación porcentual del capital invertido segmentado por familias de productos (*lácteos, botanas, etc.*).
+            </p>
+        </div>
+    </div>
+</div>
+
+            <div id="view-configuracion" class="app-view">
+                <div class="view-header">
+                    <div>
+                        <h2>Configuración del Sistema</h2>
+                        <p class="subtitle">Mantenimiento de credenciales y seguridad global</p>
+                    </div>
+                </div>
+                <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); padding: 2rem; border-radius: 8px; max-width: 600px;">
+                    <h3 style="margin-bottom: 1.5rem; color: var(--text-main);">Cambiar Contraseña de Administrador</h3>
+                    <form id="form-config-password" onsubmit="actualizarPasswordAdmin(event)">
+                        <div class="form-group"><label>Contraseña Actual</label><input type="password" id="cfg-pass-actual" required placeholder="••••••••"></div>
+                        <div class="form-group"><label>Nueva Contraseña</label><input type="password" id="cfg-pass-nueva" required placeholder="Mínimo 4 caracteres"></div>
+                        <div class="form-group"><label>Confirmar Nueva Contraseña</label><input type="password" id="cfg-pass-confirmar" required placeholder="Repite la contraseña"></div>
+                        <button type="submit" class="btn btn-primary">Guardar Cambios de Seguridad</button>
+                    </form>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div id="modal-producto" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modal-titulo">Registrar Nuevo Producto</h3>
+                <button class="close-modal-btn" onclick="closeModal('modal-producto')">×</button>
+            </div>
+            
+            <form id="form-producto" onsubmit="guardarProducto(event)">
+                <input type="hidden" id="form-id">
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="prod-tventa">Esquema de Venta</label>
+                        <select id="prod-tventa">
+                            <option value="Unidad" selected>Por Unidad (Piezas/Paquetes)</option>
+                            <option value="Granel">A Granel (Kilos/Fracciones)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prod-sku">Código SKU / Barras</label>
+                        <input type="text" id="prod-sku" required placeholder="Ej. 750100112233">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prod-nombre">Nombre del Producto</label>
+                        <input type="text" id="prod-nombre" required placeholder="Ej. Pan Integral Bimbo">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prod-categoria">Categoría del Producto</label>
+                        <select id="prod-categoria" onchange="verificarNuevoRegistro('categoria')"></select>
+                        <input type="text" id="nuevo-nombre-categoria" placeholder="Escribe la nueva categoría" style="display: none; margin-top: 0.5rem;" maxlength="30">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prod-marca">Marca Fabricante</label>
+                        <select id="prod-marca" onchange="verificarNuevoRegistro('marca')"></select>
+                        <input type="text" id="nuevo-nombre-marca" placeholder="Escribe la nueva marca" style="display: none; margin-top: 0.5rem;" maxlength="40">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prod-pcompra">Costo de Compra ($)</label>
+                        <input type="number" id="prod-pcompra" required step="0.01" min="0" oninput="calcularMargenGanancia()" placeholder="0.00">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prod-pventa">Precio de Venta al Público ($)</label>
+                        <input type="number" id="prod-pventa" required step="0.01" min="0" oninput="calcularMargenGanancia()" placeholder="0.00">
+                        <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.2rem; display: block;">
+                            Margen Neto Estimado (Con IVA 16%): <strong id="lbl-margen-calculado" style="color: var(--color-success);">0.00%</strong>
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prod-stock">Stock Inicial Físico</label>
+                        <input type="number" id="prod-stock" required placeholder="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prod-stock-min">Punto de Stock Mínimo (Alerta)</label>
+                        <input type="number" id="prod-stock-min" required placeholder="Ej. 5">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prod-proveedor">Proveedor de Contacto</label>
+                        <input type="text" id="prod-proveedor" placeholder="Ej. Distribuidora Bimbo S.A.">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prod-fvencimiento">Fecha de Vencimiento (Caducidad)</label>
+                        <input type="date" id="prod-fvencimiento">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prod-estado">Estado Sanitario Inicial</label>
+                        <select id="prod-estado">
+                            <option value="Óptimo" selected>Óptimo (Apto para venta)</option>
+                            <option value="Advertencia">Advertencia (Próximo a vencer)</option>
+                            <option value="Crítico">Crítico (Merma/No vender)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label for="prod-descripcion">Notas / Descripción Extra</label>
+                    <textarea id="prod-descripcion" rows="2" placeholder="Detalles de presentación, lote o ubicación en estante..."></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-producto')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Producto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-password" class="modal-overlay">
+        <div class="modal-card" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>Clave de Administrador</h3>
+                <button class="close-modal-btn" onclick="closeModal('modal-password')">×</button>
+            </div>
+            <form onsubmit="validarPasswordAdmin(event)">
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label>Introduce la contraseña para desbloquear:</label>
+                    <input type="password" id="txt-modal-password" required placeholder="••••••••" autofocus>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-password')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Acceder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/ui.js"></script>
+    <script>
+        // Eliminamos mostrarVista vieja de aquí para usar centralizadamente la de ui.js
+        function toggleNotifPanel() {
+            const panel = document.getElementById('notif-panel');
+            if(panel) panel.classList.toggle('show');
+        }
+
+        function removeNotification(btn) {
+            const item = btn.parentElement;
+            item.style.opacity = '0';
+            setTimeout(() => {
+                item.remove();
+                const lista = document.getElementById('notif-list');
+                const badge = document.getElementById('notif-badge');
+                if(lista && badge) {
+                    const total = lista.children.length;
+                    badge.innerText = total;
+                    if(total === 0) badge.style.display = 'none';
+                }
+            }, 300);
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="js/ui.js"></script>
+</body>
+</html>
