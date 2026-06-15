@@ -140,25 +140,44 @@ function seleccionarProductoDetalle(idProducto) {
     document.getElementById('det-fin-venta').innerText = `$${parseFloat(p.pVenta).toFixed(2)}`;
     document.getElementById('det-fin-margen').innerText = `${p.margenCalculado.toFixed(1)}%`;
 
-    const lblFecha = document.getElementById('det-cad-fecha');
-    const lblDias = document.getElementById('det-cad-dias');
 
-    if (p.fVencimiento) {
-        lblFecha.innerText = formatearFechaLegible(p.fVencimiento);
-        
-        const hoy = new Date();
-        const fechaVenc = new Date(p.fVencimiento + 'T00:00:00');
-        const diferenciaTiempo = fechaVenc - hoy;
-        const diasRestantes = Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24));
 
-        if (diasRestantes > 0) {
-            lblDias.innerText = `${diasRestantes} días`;
-            lblDias.style.color = diasRestantes <= 15 ? '#f59e0b' : '#22c55e';
-        } else {
-            lblDias.innerText = `⚠️ CADUCADO`;
-            lblDias.style.color = '#ef4444';
-        }
-    } else {
+    const lblFecha = document.getElementById('det-cad-fecha');
+    const lblDias = document.getElementById('det-cad-dias');
+
+    if (p.fVencimiento) {
+        // 1. Nos aseguramos de recortar solo los primeros 10 caracteres (YYYY-MM-DD)
+        const fechaPura = String(p.fVencimiento).substring(0, 10);
+
+        // 2. Mostramos la fecha formateada de manera limpia (Ej: 13 Ene 2027)
+        lblFecha.innerText = formatearFechaLegible(fechaPura);
+        
+        // 3. Creamos los objetos de fecha sin desfases horarios
+        const partes = fechaPura.split('-');
+        const fechaVenc = new Date(partes[0], partes[1] - 1, partes[2]);
+        const hoy = new Date();
+        
+        // 4. Ponemos las horas en 0 para comparar únicamente los días del calendario
+        hoy.setHours(0, 0, 0, 0);
+        fechaVenc.setHours(0, 0, 0, 0);
+        
+        // 5. Calculamos la diferencia real en días
+        const diferenciaTiempo = fechaVenc.getTime() - hoy.getTime();
+        const diasRestantes = Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24));
+
+        // 6. Asignamos el texto y color correcto según los días reales
+        if (diasRestantes < 0) {
+            lblDias.innerText = `⚠️ CADUCADO`;
+            lblDias.style.color = '#ef4444'; // Rojo
+        } else if (diasRestantes <= 15) {
+            lblDias.innerText = `⚠️ Próximo (${diasRestantes} días)`;
+            lblDias.style.color = '#f59e0b'; // Amarillo
+        } else {
+            lblDias.innerText = `✅ ${diasRestantes} días`;
+            lblDias.style.color = '#22c55e'; // Verde
+        }
+    }
+    else {
         lblFecha.innerText = "No perecedero";
         lblDias.innerText = "N/A";
         lblDias.style.color = 'var(--text-muted)';

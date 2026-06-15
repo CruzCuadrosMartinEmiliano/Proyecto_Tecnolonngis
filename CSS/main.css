@@ -494,3 +494,126 @@ footer {
 
 
 
+
+
+
+
+
+/* Nuevo diseño unificado */
+.insight-redesign {
+    padding: 5rem 2rem;
+    background: #ffffff; /* Fondo blanco limpio para resaltar la app oscura */
+    border-radius: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    margin: 4rem auto;
+    width: min(1200px, 95%);
+}
+
+.insight-wrapper {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+/* Estilos de los textos */
+.insight-info-side h2 {
+    font-size: 2.5rem;
+    color: #071a41;
+    margin: 0.5rem 0 1rem 0;
+}
+
+.insight-badge {
+    color: #0f4c81;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.insight-subtitle {
+    font-size: 1.1rem;
+    color: #475569;
+    line-height: 1.7;
+    margin-bottom: 2.5rem;
+}
+
+/* Lista de características optimizada (hacia abajo, no en cajas separadas) */
+.insight-features-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+}
+
+.feature-item-inline {
+    display: flex;
+    gap: 1.2rem;
+    align-items: flex-start;
+}
+
+.feature-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-weight: bold;
+    color: white;
+}
+.feature-icon.precision { background: #219EBC; }
+.feature-icon.eficiencia { background: #0f4c81; }
+.feature-icon.crecimiento { background: #FFD60A; color: #000814; }
+
+.feature-item-inline h3 {
+    font-size: 1.2rem;
+    color: #0f4c81;
+    margin-bottom: 0.25rem;
+}
+
+.feature-item-inline p {
+    color: #475569;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* Contenedor de la captura con efecto de elevación flotante */
+.insight-visual-side {
+    display: flex;
+    justify-content: center;
+}
+
+.screenshot-frame {
+    background: #0f172a;
+    padding: 0.5rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 30px 60px rgba(15, 76, 129, 0.25);
+    border: 1px solid rgba(15, 76, 129, 0.1);
+    transition: transform 0.4s ease;
+}
+
+.screenshot-frame img {
+    display: block;
+    width: 100%;
+    max-width: 440px;
+    height: auto;
+    border-radius: 1.1rem;
+}
+
+.screenshot-frame:hover {
+    transform: translateY(-8px);
+}
+
+/* Responsivo para móviles */
+@media (max-width: 1080px) {
+    .insight-wrapper {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+    .insight-info-side {
+        text-align: center;
+    }
+    .feature-item-inline {
+        text-align: left;
+    }
+}
