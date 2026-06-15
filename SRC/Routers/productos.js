@@ -58,7 +58,7 @@ router.put('/:id', verificarSesion, async (req, res) => {
     const usuarioId = req.session.usuarioId;
     const fields = [];
     const params = [];
-    const allowed = ['sku', 'nombre', 'descripcion', 'categoria', 'marca', 'pCompra', 'pVenta', 'stock', 'stockMin', 'proveedor', 'tVenta', 'fVencimiento', 'estado'];
+    const allowed = ['sku', 'nombre', 'descripcion', 'categoria', 'marca', 'pCompra', 'pVenta', 'stock', 'stockMin', 'proveedor', 'tVenta', 'fVencimiento', 'estado', 'unidadesVendidas'];
     
     allowed.forEach(field => {
         if (req.body[field] !== undefined) {

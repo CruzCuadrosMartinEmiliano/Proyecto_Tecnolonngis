@@ -1,6 +1,9 @@
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const session = require('express-session');
 
 const app = express();
 //servidor para iniciarlizar con express
@@ -9,11 +12,26 @@ const PORT = process.env.PORT || 3000;
 
 //para poder aplicar el MVC necesitamos un intermediario que se va a encargar de ser un mesero (middleware), el cual para cada peticion que pasa por la ruta de la vista, obtiene una petición y la envia a un controlador
 
-app.use(cors());
+//como el frontend y el backend se sirven desde el mismo origen, habilitamos
+//cors con credenciales para que la cookie de sesion viaje en cada peticion
+app.use(cors({ origin: true, credentials: true }));
 
 //las peticiones las debemos de atender en un formato JSON, lo que permite poder detectar los elementos bajo los criterios clave, valor
 
 app.use(express.json());
+
+//configuramos la sesion del lado del servidor: al iniciar sesion guardamos el
+//usuarioId en req.session y cada peticion posterior lo recibe por medio de la
+//cookie firmada, lo que permite separar los datos por cuenta
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'administratech-secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24 // 1 dia
+    }
+}));
 
 //que se debe de tener una ruta personalizada por cada tipo de petición next es la ruta a la cual se va atender el tipo de petión o de respuesta
 
@@ -32,7 +50,7 @@ app.use(express.static(path.join(__dirname)));
 //router.post('/')
 //router.get('/:id')
 // 1. Importas tu nuevo archivo de rutas (ponlo arriba con tus otros requires)
-const inicioSesionRouter = require('./SRC/Routers/inicio_sesion');
+const inicioSesionRouter = require('./SRC/Routers/Inicio_sesion');
 const usuariosRouter = require('./SRC/Routers/usuarios');
 const productosRouter = require('./SRC/Routers/productos');
 const ventasRouter = require('./SRC/Routers/ventas');
