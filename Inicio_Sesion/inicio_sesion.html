@@ -13,7 +13,7 @@
                 <span>Administratech</span>
             </div>
             <div class="form" id="form">
-                <form class="login">
+                <form class="login" id="form-login">
                     <h2>Welcome Back</h2>
                 <p>Welcome back! Please enter your details.</p>
                 <div class="input">
@@ -22,7 +22,7 @@
                 </div>
                 <div class="input">
                     <label for="password">Password</label>
-                    <input type="password" name="password" id="password" placeholder="Enter your password">
+                    <input type="password" name="password" id="password" autocomplete="current-password" placeholder="Enter your password">
                 </div>
                 <div class="reminder">
                     <div class="checkbox-container">
@@ -32,15 +32,12 @@
                     <span class="forgot">Forgot password</span>
                 </div>
                 <div class="buttons">
-                    <button>Sign in</button>
-                    <button>
-                        <img src="icons/ic-google.svg" alt="ic-google" class="icon-google">
-                        Google
-                    </button>
+                    <button type="submit">Sign in</button>
                 </div>
+                <div id="login-message" class="form-message"></div>
                 <p class="account">Don't have account? <a href="#" id="sign-up">Sign up</a></p>
                 </form>
-                <form class="register">
+                <form class="register" id="form-register">
                     <h2>Create your account</h2>
                 <p>Use your email to register</p>
                 <div class="input">
@@ -53,16 +50,13 @@
                 </div>
                 <div class="input">
                     <label for="password">Password</label>
-                    <input type="password" name="passwordR" id="passwordR" placeholder="Enter your password">
+                    <input type="password" name="passwordR" id="passwordR" autocomplete="new-password" maxlength="8" placeholder="Enter your password (max 8 chars)">
                 </div>
                 
                 <div class="buttons">
-                    <button>Register</button>
-                    <button>
-                        <img src="icons/ic-google.svg" alt="ic-google" class="icon-google">
-                        Google
-                    </button>
+                    <button type="submit">Register</button>
                 </div>
+                <div id="register-message" class="form-message"></div>
                 <p class="account">Alredy have an account ? <a href="#" id="sign-in">log in</a></p>
                 </form>
             </div>
@@ -82,6 +76,6 @@
     
     
     
-    <script src="JS_Inicio/inicio.js"></script>
+    <script src="js_Inicio/inicio_app.js"></script>
 </body>
 </html>

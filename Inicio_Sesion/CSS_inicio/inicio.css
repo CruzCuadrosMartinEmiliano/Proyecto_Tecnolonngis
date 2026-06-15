@@ -121,6 +121,30 @@ top: 50%;
     border-radius: 0.2rem;
     padding: 0.5rem;
 }
+.form-message {
+    width: 100%;
+    min-height: 1.4rem;
+    margin: 0.5rem 0 0.9rem;
+    padding: 0.7rem 0.9rem;
+    border-radius: 0.45rem;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    border: 1px solid transparent;
+}
+.form-message.error {
+    background-color: rgba(239, 68, 68, 0.18);
+    border-color: #ef4444;
+}
+.form-message.success {
+    background-color: rgba(16, 185, 129, 0.16);
+    border-color: #10b981;
+}
+.form-message.info {
+    background-color: rgba(59, 130, 246, 0.16);
+    border-color: #3b82f6;
+}
 .form .reminder{
     display: flex;
     justify-content: space-between;
@@ -166,9 +190,7 @@ gap: 0.2rem;
     background-color:#219EBC;
     color: white;
 }
-.form .buttons button:last-child{
-    background-color: #8ECAE6;
-}
+
 .form .account{
     text-align: center;
     font-size: 0.75rem;
