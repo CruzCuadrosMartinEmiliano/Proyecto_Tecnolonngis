@@ -89,7 +89,7 @@
                 <div class="actions-bar">
                     <div class="search-box">
                         <span class="search-icon">🔍</span>
-                        <input type="text" id="txt-buscar" oninput="filtrarProductos()" placeholder="Buscar por nombre o código SKU...">
+                        <input type="text" id="txt-buscar" oninput="filtrarProductos()" placeholder="Buscar por nombre o código SKU..." autocomplete="off">
                     </div>
                     <div class="actions-right">
                         <button type="button" class="btn btn-secondary" onclick="cerrarSesionYVolverInicio()">🏠 Volver a Inicio</button>
@@ -180,7 +180,7 @@
                 <div class="actions-bar" style="position: relative;">
                     <div class="search-box" style="max-width: 450px; flex: 1; position: relative;">
                         <span class="search-icon">🔍</span>
-                        <input type="text" id="txt-buscar-detalle" oninput="buscarProductoDetalle()" placeholder="Escribe el nombre o SKU del producto..." autocomplete="off">
+                        <input type="text" id="txt-buscar-detalle" oninput="buscarProductoDetalle()" placeholder="Escribe el nombre o SKU del producto..." autocomplete="off" maxlength="15">
                         <div id="detalle-resultados-busqueda" class="dropdown-resultados" style="display: none;"></div>
                     </div>
                     <button class="btn btn-secondary" onclick="limpiarPantallaDetalle()">🔄 Limpiar</button>
@@ -357,14 +357,14 @@
                             <h3>Inicio de Sesión</h3>
                             <p>Accede al sistema desde el panel de configuración.</p>
                         </div>
-                        <form id="form-login-config" onsubmit="iniciarSesionConfig(event)">
+                        <form id="form-login-config" onsubmit="iniciarSesionConfig(event)" autoclomplete="off" >
                             <div class="form-group">
                                 <label for="cfg-login-email">Correo electrónico</label>
-                                <input type="email" id="cfg-login-email" required placeholder="admin@admin.com">
+                                <input type="email" id="cfg-login-email" required placeholder="admin@admin.com" autocomplete="off">
                             </div>
                             <div class="form-group">
                                 <label for="cfg-login-password">Contraseña</label>
-                                <input type="password" id="cfg-login-password" required placeholder="••••••••">
+                                <input type="password" id="cfg-login-password" required placeholder="••••••••" autocomplete="new-password">
                             </div>
                             <div class="form-actions-config">
                                 <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
@@ -455,12 +455,12 @@
 
                     <div class="form-group">
                         <label for="prod-pcompra">Costo de Compra ($)</label>
-                        <input type="number" id="prod-pcompra" required step="0.01" min="0" oninput="calcularMargenGanancia()" placeholder="0.00">
+                        <input type="number" id="prod-pcompra" required step="0.01" min="0" oninput="calcularMargenGanancia()" placeholder="0.00" maxlength="10">
                     </div>
 
                     <div class="form-group">
                         <label for="prod-pventa">Precio de Venta al Público ($)</label>
-                        <input type="number" id="prod-pventa" required step="0.01" min="0" oninput="calcularMargenGanancia()" placeholder="0.00">
+                        <input type="number" id="prod-pventa" required step="0.01" min="0" oninput="calcularMargenGanancia()" placeholder="0.00" maxlength ="10">
                         <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.2rem; display: block;">
                             Margen Neto Estimado (Con IVA 16%): <strong id="lbl-margen-calculado" style="color: var(--color-success);">0.00%</strong>
                         </small>
@@ -712,31 +712,40 @@
         }
 
         function actualizarSesionUI() {
-            const sesion = JSON.parse(localStorage.getItem('admintech_sesion')) || null;
-            const status = document.getElementById('cfg-session-status');
-            const logoutBtn = document.getElementById('btn-logout-config');
-            const loginForm = document.getElementById('form-login-config');
-            const submitButton = loginForm ? loginForm.querySelector('button[type="submit"]') : null;
-            const sidebarUser = document.getElementById('sidebar-active-user');
-            const usuarioActivo = sesion && (sesion.username || sesion.email) ? (sesion.username || sesion.email) : 'Invitado';
+    const sesion = JSON.parse(localStorage.getItem('admintech_sesion')) || null;
+    const status = document.getElementById('cfg-session-status');
+    const logoutBtn = document.getElementById('btn-logout-config');
+    const loginForm = document.getElementById('form-login-config');
+    const submitButton = loginForm ? loginForm.querySelector('button[type="submit"]') : null;
+    const sidebarUser = document.getElementById('sidebar-active-user');
+    const usuarioActivo = sesion && (sesion.username || sesion.email) ? (sesion.username || sesion.email) : 'Invitado';
 
-            if (status) {
-                status.innerText = usuarioActivo;
-            }
-            const appActiveUser = document.getElementById('app-active-user');
-            if (sidebarUser) {
-                sidebarUser.innerText = usuarioActivo;
-            }
-            if (appActiveUser) {
-                appActiveUser.innerText = usuarioActivo;
-            }
-            if (logoutBtn) {
-                logoutBtn.style.display = sesion && sesion.username ? 'inline-flex' : 'none';
-            }
-            if (submitButton) {
-                submitButton.innerText = sesion && sesion.username ? 'Cambiar usuario' : 'Iniciar Sesión';
-            }
-        }
+    if (status) {
+        status.innerText = usuarioActivo;
+    }
+    const appActiveUser = document.getElementById('app-active-user');
+    if (sidebarUser) {
+        sidebarUser.innerText = usuarioActivo;
+    }
+    if (appActiveUser) {
+        appActiveUser.innerText = usuarioActivo;
+    }
+    if (logoutBtn) {
+        logoutBtn.style.display = sesion && sesion.username ? 'inline-flex' : 'none';
+    }
+    if (submitButton) {
+        submitButton.innerText = sesion && sesion.username ? 'Cambiar usuario' : 'Iniciar Sesión';
+    }
+
+    // ==========================================================================
+    // 🔥 SOLUCIÓN AL BUG DEL BUSCADOR
+    // ==========================================================================
+    // Forzamos la limpieza del buscador para destruir el autocompletado del navegador
+    const buscador = document.getElementById('txt-buscar');
+    if (buscador) {
+        buscador.value = ''; 
+    }
+}
 
         function restaurarSesionDesdeQuery() {
             const params = new URLSearchParams(window.location.search);
@@ -806,6 +815,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             restaurarSesionDesdeQuery();
             verificarSesionActiva();
+            setTimeout(() => { document.getElementById('txt-buscar').value = ''; }, 100);
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

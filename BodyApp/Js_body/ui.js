@@ -33,27 +33,31 @@ function validarPasswordAdmin(event) {
 // ==========================================================================
 // LÓGICA DE CONTROL: MÓDULO DE PRODUCTOS (FASE 4)
 // ==========================================================================
+
 function cargarSelectProductosDetalle() {
-    const select = document.getElementById('prod-detalle-selector');
-    const wrapper = document.getElementById('wrapper-metricas-producto');
-    const vacio = document.getElementById('m-estado-vacio');
-    
-    if (!select) return;
+    const select = document.getElementById('prod-detalle-selector');
+    const wrapper = document.getElementById('wrapper-metricas-producto');
+    const vacio = document.getElementById('m-estado-vacio');
+    
+    if (!select) return;
 
-    if (INVENTARIO.length === 0) {
-        select.innerHTML = '<option value="">-- No hay productos registrados --</option>';
-        if(wrapper) wrapper.style.display = 'none';
-        if(vacio) vacio.style.display = 'block';
-        return;
-    }
+    // Caso A: No hay productos registrados en el sistema
+    if (!INVENTARIO || INVENTARIO.length === 0) {
+        select.innerHTML = '<option value="">-- No hay productos registrados --</option>';
+        if (wrapper) wrapper.style.display = 'none';
+        if (vacio) vacio.style.display = 'block';
+        return;
+    }
 
-    select.innerHTML = '<option value="">-- Selecciona un producto para inspeccionar --</option>' + 
-        INVENTARIO.map(p => `<option value="${p.id}">${p.nombre} (${p.sku})</option>`).join('');
-        
-    if(wrapper) wrapper.style.display = 'none';
-    if(vacio) vacio.style.display = 'block';
+    // Caso B: Hay productos. Renderizamos las opciones del selector
+    select.innerHTML = '<option value="">-- Selecciona un producto para inspeccionar --</option>' + 
+        INVENTARIO.map(p => `<option value="${p.id}">${p.nombre} (${p.sku})</option>`).join('');
+        
+    // IMPORTANTE: Al recargar, ocultamos el wrapper de métricas antiguas y mostramos 
+    // el aviso de "selecciona un producto" para evitar desfases visuales con datos viejos
+    if (wrapper) wrapper.style.display = 'none';
+    if (vacio) vacio.style.display = 'block';
 }
-
 function cargarMétricasIndividuales() {
     const idSeleccionado = document.getElementById('prod-detalle-selector').value;
     const wrapper = document.getElementById('wrapper-metricas-producto');
@@ -447,4 +451,98 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bindModalPasswordForm);
 } else {
     bindModalPasswordForm();
+}
+function actualizarAlertasSistema() {
+    const listaNotif = document.getElementById('notif-list');
+    const badge = document.getElementById('notif-badge'); // Selector de la campanita
+    
+    if (!listaNotif) return;
+
+    // Limpiamos el contenedor antes de evaluar
+    listaNotif.innerHTML = '';
+
+    if (!INVENTARIO || INVENTARIO.length === 0) {
+        listaNotif.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem; padding: 0.5rem;">No hay registros para evaluar.</div>';
+        if (badge) badge.style.display = 'none'; // Ocultar si no hay inventario
+        return;
+    }
+
+    let alertasHTML = '';
+    let contadorAlertas = 0; // Aquí sumamos cada anomalía detectada
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    INVENTARIO.forEach(p => {
+        // --- 1. VALIDACIÓN DE STOCK (BAJO O CRÍTICO) ---
+        const stockActual = parseFloat(p.stock) || 0;
+        const stockMinimo = parseFloat(p.stockMin) || 0;
+        const unidad = p.tVenta === 'Granel' ? 'kg' : 'pzas';
+
+        if (stockActual <= stockMinimo) {
+            contadorAlertas++; // Suma al contador global
+            if (stockActual === 0) {
+                alertasHTML += `
+                    <div class="notif-item danger" style="padding: 0.6rem 0.8rem; margin-bottom: 0.5rem; background: rgba(239, 68, 68, 0.15); border-left: 4px solid #ef4444; border-radius: 4px;">
+                        <strong style="color: #ef4444; font-size: 0.85rem;">🚨 SIN STOCK: ${p.nombre}</strong><br>
+                        <small style="color: #94a3b8; font-size: 0.75rem;">El inventario está en 0 ${unidad} (SKU: ${p.sku})</small>
+                    </div>`;
+            } else {
+                alertasHTML += `
+                    <div class="notif-item warning" style="padding: 0.6rem 0.8rem; margin-bottom: 0.5rem; background: rgba(245, 158, 11, 0.1); border-left: 4px solid #f59e0b; border-radius: 4px;">
+                        <strong style="color: #f59e0b; font-size: 0.85rem;">⚠️ STOCK BAJO: ${p.nombre}</strong><br>
+                        <small style="color: #94a3b8; font-size: 0.75rem;">Quedan solo ${stockActual} ${unidad} (Mínimo requerido: ${stockMinimo})</small>
+                    </div>`;
+            }
+        }
+
+        // --- 2. VALIDACIÓN DE FECHA DE CADUCIDAD ---
+        if (p.fVencimiento) {
+            const fechaPura = String(p.fVencimiento).substring(0, 10);
+            const partes = fechaPura.split('-');
+            
+            if (partes.length === 3) {
+                const fechaVenc = new Date(partes[0], partes[1] - 1, partes[2]);
+                fechaVenc.setHours(0, 0, 0, 0);
+
+                const diferenciaTiempo = fechaVenc.getTime() - hoy.getTime();
+                const diasRestantes = Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24));
+
+                if (diasRestantes < 0) {
+                    contadorAlertas++; // Suma al contador global
+                    alertasHTML += `
+                        <div class="notif-item danger" style="padding: 0.6rem 0.8rem; margin-bottom: 0.5rem; background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; border-radius: 4px;">
+                            <strong style="color: #ef4444; font-size: 0.85rem;">🚨 CADUCADO: ${p.nombre}</strong><br>
+                            <small style="color: #94a3b8; font-size: 0.75rem;">Venció el: ${formatearFechaLegible(fechaPura)} (SKU: ${p.sku})</small>
+                        </div>`;
+                } else if (diasRestantes <= 15) {
+                    contadorAlertas++; // Suma al contador global
+                    alertasHTML += `
+                        <div class="notif-item warning" style="padding: 0.6rem 0.8rem; margin-bottom: 0.5rem; background: rgba(245, 158, 11, 0.1); border-left: 4px solid #f59e0b; border-radius: 4px;">
+                            <strong style="color: #f59e0b; font-size: 0.85rem;">⚠️ PRÓXIMO A VENCER: ${p.nombre}</strong><br>
+                            <small style="color: #94a3b8; font-size: 0.75rem;">Quedan ${diasRestantes} días (Vence: ${formatearFechaLegible(fechaPura)})</small>
+                        </div>`;
+                }
+            }
+        }
+    });
+
+    // --- 3. ACTUALIZAR EL BADGE DE LA CAMPANITA ---
+    if (badge) {
+        if (contadorAlertas > 0) {
+            badge.innerText = contadorAlertas;
+            badge.style.display = 'inline-block'; // Lo mostramos si hay alertas
+        } else {
+            badge.style.display = 'none'; // Se oculta por completo si todo está en orden
+        }
+    }
+
+    // Renderizar la lista en el panel lateral
+    if (alertasHTML === '') {
+        listaNotif.innerHTML = `
+            <div style="color:#22c55e; font-size:0.85rem; padding: 0.5rem; font-style:italic;">
+                ✅ Todo bajo control. Stock óptimo y sin problemas de caducidad.
+            </div>`;
+    } else {
+        listaNotif.innerHTML = alertasHTML;
+    }
 }

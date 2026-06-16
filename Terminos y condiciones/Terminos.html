@@ -1,42 +1,127 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terminos y condiciones</title>
+    <title>Términos y Condiciones - Administratech</title>
     <link rel="stylesheet" href="Terminos.css">
 </head>
 <body>
     <header>
         <nav>
-            <div class="Logo"></div>
-            <div class="links"> <a href="../index.html">Conocenos</a> <a href="#">Terminos y Condiciones</a></div>
-            <div class="Inicio_sesion"><a href="../Inicio_Sesion/inicio_sesion.html">Inicia sesión</a></div>
+            <div class="logo">
+                <img src="../images/logo.png" alt="Logo Administratech">
+            </div>
+            <div class="links"> 
+                <a href="../index.html">Conócenos</a> 
+                <a href="#" class="active">Términos y Condiciones</a>
+            </div>
+            <div class="Inicio_sesion">
+                <a href="../Inicio_Sesion/inicio_sesion.html">Inicia sesión</a>
+            </div>
         </nav>
     </header>
+
     <main>
-        <section class="terms-container">
-            <h1>Términos y Condiciones</h1>
-            <p>Bienvenido a Administratech. Al utilizar esta plataforma aceptas los términos y condiciones descritos a continuación.</p>
+        <article class="terms-container">
+            <header class="terms-header">
+                <h1>Términos y Condiciones de Uso</h1>
+                <p class="terms-subtitle">Última actualización: Junio 2026</p>
+                <div class="terms-lead">
+                    Por favor, lea detenidamente este documento antes de utilizar la plataforma. Al acceder o utilizar <strong>ADMINISTRATECH</strong>, usted acepta quedar vinculado por los presentes términos y condiciones legales.
+                </div>
+            </header>
 
-            <h2>1. Uso del servicio</h2>
-            <p>El acceso a la plataforma está reservado para usuarios registrados. Está prohibido utilizar el servicio con fines ilícitos, abusivos o para dañar la experiencia de terceros.</p>
+            <section class="terms-section">
+                <h2>1. Definición del Servicio y Alcance</h2>
+                <p>ADMINISTRATECH es una solución tecnológica integral, robusta y escalable desarrollada bajo una arquitectura de software Modelo-Vista-Controlador (MVC). El Sistema está diseñado específicamente para la optimización, automatización, control y gestión de inventarios, flujos de caja, reportes de existencias y administración de ventas en tiempo real para negocios enfocados en el sector minorista (retail).</p>
+                <p>Las interfaces gráficas del Sistema, desarrolladas tanto en Java (Swing) para entornos locales como en entornos web mediante JavaScript y Node.js, operan en constante comunicación con sistemas de gestión de bases de datos relacionales en MySQL.</p>
+            </section>
 
-            <h2>2. Registro y seguridad</h2>
-            <p>Debes mantener tus credenciales en privado. Administratech no se hace responsable por el uso no autorizado de tu cuenta si tu información de acceso es compartida con terceros.</p>
+            <section class="terms-section">
+                <h2>2. Condiciones de Acceso, Registro y Seguridad</h2>
+                <div class="terms-subblock">
+                    <h3>A. Capacidad Legal</h3>
+                    <p>El uso del Sistema está estrictamente reservado para personas físicas o morales con la capacidad legal suficiente para contratar y contraer obligaciones bajo el marco jurídico civil y mercantil vigente.</p>
+                </div>
+                <div class="terms-subblock">
+                    <h3>B. Veracidad de la Información</h3>
+                    <p>El Usuario se compromete y obliga a proporcionar información totalmente exacta, verídica, actual y comprobable en todos los formularios de registro, alta de usuarios, perfiles de administrador y configuración del comercio.</p>
+                </div>
+                <div class="terms-subblock">
+                    <h3>C. Confidencialidad y Custodia de Cuentas</h3>
+                    <p>El acceso a ADMINISTRATECH se realiza mediante credenciales de autenticación únicas, secretas e intransferibles compuestas por un nombre de usuario y una contraseña cifrada. El Usuario es el único y exclusivo responsable de salvaguardar dichas credenciales.</p>
+                    <p>Cualquier operación, modificación de inventario, borrado de registros o transacción efectuada desde una cuenta activa se presumirá firmemente realizada por el Usuario titular de dicha cuenta, deslindando al Sistema de accesos no autorizados por negligencia del Cliente.</p>
+                </div>
+            </section>
 
-            <h2>3. Contenido y responsabilidad</h2>
-            <p>La información generada dentro de la aplicación es responsabilidad del usuario. Administratech no asume responsabilidad por decisiones de negocio tomadas con base en los datos aquí mostrados.</p>
+            <section class="terms-section">
+                <h2>3. Propiedad Intelectual y Licencia de Uso</h2>
+                <div class="terms-subblock">
+                    <h3>A. Reserva de Derechos</h3>
+                    <p>Todo el software que compone ADMINISTRATECH, incluyendo de manera enunciativa mas no limitativa: el código fuente, el código objeto, las interfaces de usuario (UI), los componentes de Java Swing, scripts de Node.js, estructuras de consulta y diccionarios de datos de la base de datos MySQL, algoritmos lógicos, hojas de estilo, marcas, nombres comerciales, logotipos, gráficos, manuales de usuario y documentación técnica, son propiedad exclusiva y absoluta de sus desarrolladores originales y están protegidos por las leyes de propiedad intelectual y derechos de autor.</p>
+                </div>
+                <div class="terms-subblock">
+                    <h3>B. Licencia de Uso Limitada</h3>
+                    <p>ADMINISTRATECH otorga al Usuario una licencia de uso de software de carácter personal, revocable, no exclusiva, limitada y no transferible, con la única finalidad de gestionar el negocio interno del Usuario según las capacidades del sistema.</p>
+                </div>
+                <div class="terms-subblock">
+                    <h3>C. Prohibiciones Explícitas</h3>
+                    <p>Queda estrictamente prohibido, y será sancionado bajo la legislación penal y civil correspondiente, cualquier intento de ingeniería inversa, descompilación, modificación, alteración, traducción, duplicación, distribución pública, venta, sublicenciamiento o creación de obras derivadas que utilicen como base la arquitectura, el backend o el frontend de este Sistema sin un consentimiento previo, expreso y por escrito de los titulares del proyecto.</p>
+                </div>
+            </section>
 
-            <h2>4. Privacidad de datos</h2>
-            <p>Los datos personales ingresados en la aplicación se almacenan en la base de datos del sistema. El uso y tratamiento de dichos datos se rige por las políticas de privacidad internas de la plataforma.</p>
+            <section class="terms-section">
+                <h2>4. Política de Uso Correcto y Restricciones</h2>
+                <p>El Usuario se compromete a utilizar ADMINISTRATECH de buena fe, de manera ética y conforme a las leyes aplicables. Queda estrictamente prohibido y tipificado como un uso indebido de la plataforma:</p>
+                <ul>
+                    <li>El uso de cualquier tipo de script, bot, ataque de denegación de servicio (DoS), inyección de código SQL malicioso o manipulación de peticiones HTTP/HTTPS destinadas a corromper, alterar o saturar las bases de datos MySQL, los servidores de Node, o los repositorios de despliegue.</li>
+                    <li>Utilizar la infraestructura de ADMINISTRATECH para el almacenamiento, registro, catalogación o venta de productos ilícitos, sustancias prohibidas, mercancía de contrabando, armas de fuego o cualquier artículo que infrinja las leyes locales o internacionales.</li>
+                    <li>Intentar vulnerar las ramas de desarrollo del proyecto en sistemas de control de versiones o repositorios públicos y privados.</li>
+                </ul>
+            </section>
 
-            <h2>5. Cambios en los términos</h2>
-            <p>Administratech puede actualizar estos términos en cualquier momento. Las modificaciones se harán efectivas al publicarse en esta página.</p>
-        </section>
+            <section class="terms-section">
+                <h2>5. Tratamiento de Datos, Cálculos e Impuestos</h2>
+                <div class="terms-subblock">
+                    <h3>A. Datos de Inventario</h3>
+                    <p>ADMINISTRATECH actúa como un procesador de los datos introducidos por el Usuario (precios, costos, descripciones de stock). Es responsabilidad única del Usuario realizar copias de seguridad de manera periódica para evitar la pérdida de información en caso de fallos en hardware local o servidores externos.</p>
+                </div>
+                <div class="terms-subblock">
+                    <h3>B. Lógica Financiera e IVA</h3>
+                    <p>El Sistema cuenta con fórmulas matemáticas automatizadas para determinar la utilidad bruta, los ingresos netos y la ganancia real denotada bajo la función matemática de utilidad $G(x)$. El Usuario reconoce y acepta que, para el cálculo de ingresos netos en aquellos artículos cuyos precios de venta al público ya incluyan impuestos, el Sistema aplica un divisor matemático estándar de **1.16** con el fin de desglosar de manera automática el Impuesto al Valor Agregado (IVA) correspondiente al 16%.</p>
+                    <p>Es responsabilidad exclusiva del Usuario validar que dicha configuración fiscal se adecúe perfectamente a la normativa impositiva de su localidad o régimen fiscal.</p>
+                </div>
+            </section>
+
+            <section class="terms-section">
+                <h2>6. Limitación de Responsabilidad</h2>
+                <div class="terms-subblock">
+                    <h3>A. Disponibilidad del Servicio</h3>
+                    <p>Si bien ADMINISTRATECH realiza esfuerzos técnicos razonables para mantener la estabilidad del sistema las 24 horas del día y los 365 días del año, no se garantiza el acceso ininterrumpido o libre de errores. El servicio puede suspenderse temporalmente debido a mantenimientos programados, actualizaciones en la arquitectura de base de datos, migraciones de servidores o fallas en las redes de telecomunicaciones de los proveedores de internet ajenos a nuestro control.</p>
+                </div>
+                <div class="terms-subblock">
+                    <h3>B. Exclusión de Daños</h3>
+                    <p>Bajo ninguna circunstancia los desarrolladores de ADMINISTRATECH serán responsables ante el Usuario o terceros por daños directos, indirectos, incidentales, consecuentes, especiales o punitivos. Esto incluye, pero no se limita a: la pérdida de ganancias o utilidades del negocio, pérdidas financieras por discrepancies en los reportes de inventario, desajustes de caja chica, errores humanos en la captura de precios, errores de redondeo numérico, pérdida de datos por corrupción de archivos o cualquier interrupción de la actividad comercial del Cliente.</p>
+                </div>
+            </section>
+
+            <section class="terms-section">
+                <h2>7. Modificaciones y Jurisdicción</h2>
+                <div class="terms-subblock">
+                    <h3>A. Cambios en los Términos</h3>
+                    <p>ADMINISTRATECH se reserva el derecho absoluto de modificar, actualizar, añadir o eliminar cláusulas del presente documento en cualquier momento y sin previo aviso. Dichas modificaciones surtirán efectos plenos de manera inmediata a partir de su publicación en la página web principal. El uso continuado del Sistema constituirá una aceptación total y sin reservas de los nuevos cambios.</p>
+                </div>
+                <div class="terms-subblock">
+                    <h3>B. Jurisdicción y Ley Aplicable</h3>
+                    <p>Para todo lo relacionado con la interpretación, cumplimiento, ejecución o resolución de cualquier controversia jurídica, las partes se someten de manera expresa y voluntaria a la jurisdicción de los tribunales competentes en materia civil y mercantil de la **Ciudad de México**, renunciando expresamente a cualquier otro fuero o jurisdicción que pudiera corresponderles por razón de sus domicilios presentes o futuros.</p>
+                </div>
+            </section>
+        </article>
     </main>
+
     <footer>
-        <p>© 2026 Administratech | Todos los derechos reservados</p>
+        <p>© 2026 Administratech | Todos los derechos reservados.</p>
     </footer>
 </body>
 </html>

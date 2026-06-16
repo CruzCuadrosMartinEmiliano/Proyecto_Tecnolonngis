@@ -29,8 +29,27 @@ router.post('/', verificarSesion, async (req, res) => {
     }
 
     try {
+        // 1. 🔥 NUEVO: Validar si la categoría ya existe para este usuario específico
+        const [rows] = await db.execute(
+            'SELECT * FROM categorias WHERE nombre = ? AND usuario_id = ?', 
+            [nombre, usuarioId]
+        );
+
+        if (rows.length > 0) {
+            // Si ya existe, no hacemos el INSERT. 
+            // Respondemos con éxito (200) para que el frontend continúe sin romperse.
+            return res.status(200).json({ 
+                status: 'success', 
+                message: 'La categoría ya existe y está lista para usarse.',
+                data: rows[0] 
+            });
+        }
+
+        // 2. Si no existe, procedemos a crearla de forma segura
         await db.execute('INSERT INTO categorias (nombre, usuario_id) VALUES (?, ?)', [nombre, usuarioId]);
+        
         res.status(201).json({ status: 'success', message: 'Categoría creada correctamente.' });
+
     } catch (error) {
         console.error('Error al crear categoría:', error);
         res.status(500).json({ status: 'error', message: 'Error interno al crear categoría.' });

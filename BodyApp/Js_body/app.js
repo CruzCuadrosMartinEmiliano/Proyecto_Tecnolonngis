@@ -168,6 +168,9 @@ async function cargarCatalogos() {
 async function recargarDatos() {
     await cargarInventario();
     renderizarTablaInventario();
+    if (typeof actualizarAlertasSistema === 'function') {
+        actualizarAlertasSistema();
+    }
     const vistaActiva = document.querySelector('.app-view.active');
     if (vistaActiva && vistaActiva.id === 'view-productos' && typeof cargarSelectProductosDetalle === 'function') {
         cargarSelectProductosDetalle();
@@ -182,7 +185,7 @@ async function recargarDatos() {
 // --------------------------------------------------------------------------
 function badgeEstado(estado) {
     const clase = estado === 'Crítico' ? 'critico' : (estado === 'Advertencia' ? 'advertencia' : 'optimo');
-    return `<span class="status-chip ${clase}">${estado || 'Óptimo'}</span>`;
+    return `<span class="status-chip ${clase}">${estado}</span>`;
 }
 
 function renderizarTablaInventario(lista) {
@@ -201,6 +204,13 @@ function renderizarTablaInventario(lista) {
     tbody.innerHTML = datos.map(p => {
         const unidad = p.tVenta === 'Granel' ? 'kg' : 'pzas';
         const alerta = p.stock <= p.stockMin ? ' style="color:#ef4444; font-weight:700;"' : '';
+    let estadoReal = 'Óptimo';
+        if (p.stock === 0) {
+            estadoReal = 'Crítico';
+        } else if (p.stock <= p.stockMin) {
+            estadoReal = 'Advertencia';
+        }
+
         return `
         <tr>
             <td>${p.sku}</td>
@@ -209,7 +219,7 @@ function renderizarTablaInventario(lista) {
             <td${alerta}>${p.stock} ${unidad}</td>
             <td>$${p.pCompra.toFixed(2)}</td>
             <td>$${p.pVenta.toFixed(2)}</td>
-            <td>${badgeEstado(p.estado)}</td>
+            <td>${badgeEstado(estadoReal)}</td>
             <td>
                 <button class="btn btn-secondary btn-sm" onclick="editarProducto(${p.id})">✏️</button>
                 <button class="btn btn-danger btn-sm" onclick="eliminarProductoDeInventario(${p.id})">🗑️</button>
@@ -303,26 +313,63 @@ async function guardarProducto(event) {
         const categoria = await resolverCatalogo('categoria');
         const marca = await resolverCatalogo('marca');
 
-        const payload = {
-            sku: document.getElementById('prod-sku').value.trim(),
-            nombre: document.getElementById('prod-nombre').value.trim(),
-            descripcion: document.getElementById('prod-descripcion').value.trim(),
-            categoria,
-            marca,
-            pCompra: parseFloat(document.getElementById('prod-pcompra').value) || 0,
-            pVenta: parseFloat(document.getElementById('prod-pventa').value) || 0,
-            stock: parseFloat(document.getElementById('prod-stock').value) || 0,
-            stockMin: parseFloat(document.getElementById('prod-stock-min').value) || 0,
-            proveedor: document.getElementById('prod-proveedor').value.trim(),
-            tVenta: document.getElementById('prod-tventa').value,
-            fVencimiento: document.getElementById('prod-fvencimiento').value || null,
-            estado: document.getElementById('prod-estado').value
-        };
+        // Captura y limpieza de valores
+        const sku = document.getElementById('prod-sku').value.trim();
+        const nombre = document.getElementById('prod-nombre').value.trim();
+        const descripcion = document.getElementById('prod-descripcion').value.trim();
+        const pCompra = parseFloat(document.getElementById('prod-pcompra').value) || 0;
+        const pVenta = parseFloat(document.getElementById('prod-pventa').value) || 0;
+        const stock = parseFloat(document.getElementById('prod-stock').value) || 0;
+        const stockMin = parseFloat(document.getElementById('prod-stock-min').value) || 0;
+        const proveedor = document.getElementById('prod-proveedor').value.trim();
+        const tVenta = document.getElementById('prod-tventa').value;
+        const fVencimiento = document.getElementById('prod-fvencimiento').value || null;
+        const estado = document.getElementById('prod-estado').value;
 
-        if (!payload.sku || !payload.nombre || !categoria || !marca) {
+        // 1. Validaciones de campos obligatorios
+        if (!sku || !nombre || !categoria || !marca) {
             mostrarMensajeApp('prod-form-message', 'SKU, nombre, categoría y marca son obligatorios.', 'error');
             return;
         }
+
+        // 2. Validaciones numéricas (Valores negativos)
+        if (pCompra < 0 || pVenta < 0 || stock < 0 || stockMin < 0) {
+            mostrarMensajeApp('prod-form-message', 'Los precios y cantidades de stock no pueden ser negativos.', 'error');
+            return;
+        }
+
+        // 3. Validación de Margen de Ganancia
+        if (pVenta <= pCompra) {
+            mostrarMensajeApp('prod-form-message', 'El precio de venta debe ser mayor al precio de compra para generar ganancias.', 'error');
+            return;
+        }
+
+        // 4. Validación lógica de Stock Mínimo
+        if (stockMin > stock) {
+            mostrarMensajeApp('prod-form-message', 'El stock mínimo no puede ser mayor que el stock actual del producto.', 'error');
+            return;
+        }
+
+        // 5. Validación de fecha de vencimiento
+        if (fVencimiento) {
+            const fechaSeleccionada = new Date(fVencimiento);
+            const fechaActual = new Date();
+            // Normalizar horas para comparar solo año-mes-día
+            fechaActual.setHours(0, 0, 0, 0);
+            fechaSeleccionada.setHours(0, 0, 0, 0);
+
+            if (fechaSeleccionada < fechaActual) {
+                mostrarMensajeApp('prod-form-message', 'La fecha de vencimiento no puede ser una fecha pasada.', 'error');
+                return;
+            }
+        }
+
+        // Construcción del Payload validado
+        const payload = {
+            sku, nombre, descripcion, categoria, marca,
+            pCompra, pVenta, stock, stockMin,
+            proveedor, tVenta, fVencimiento, estado
+        };
 
         const id = document.getElementById('form-id').value;
         if (id) {
@@ -551,6 +598,9 @@ async function iniciarAplicacion() {
         await cargarInventario();
         renderizarTablaInventario();
         renderCarrito();
+        if (typeof actualizarAlertasSistema === 'function') {
+            actualizarAlertasSistema();
+        }
     } catch (error) {
         // apiRequest ya redirige al login en caso de 401
         console.error('No se pudo inicializar la aplicación:', error.message);
@@ -558,3 +608,29 @@ async function iniciarAplicacion() {
 }
 
 document.addEventListener('DOMContentLoaded', iniciarAplicacion);
+
+// Ejecutar cuando el DOM esté completamente cargado
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // 1. Bloquear la letra 'e', 'E', '+' y '-' en los campos numéricos de productos
+    const inputsNumericos = ['prod-pcompra', 'prod-pventa', 'prod-stock', 'prod-stock-min'];
+    
+    inputsNumericos.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.addEventListener('keydown', (event) => {
+                // Si presionan 'e', 'E', '+' o '-', cancelamos la acción
+                if (['e', 'E', '+', '-'].includes(event.key)) {
+                    event.preventDefault();
+                }
+            });
+        }
+    });
+
+    // 2. Alerta visual o control de límite de SKU en el frontend (Opcional)
+    const skuInput = document.getElementById('prod-sku');
+    if (skuInput) {
+        // Le asignamos un límite físico en el formulario por si tu BD solo aguanta 15
+        skuInput.setAttribute('maxlength', '15'); 
+    }
+});
