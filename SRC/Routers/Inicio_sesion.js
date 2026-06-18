@@ -21,10 +21,20 @@ router.post('/crear', async (req, res) => {
         const query = 'INSERT INTO usuarios (username, email, password, pvpasword) VALUES (?, ?, ?, ?)';
         const [result] = await db.execute(query, [username, email, password, '']);
 
+        // Iniciamos la sesion del usuario recien creado para que sus datos
+        // queden ligados a su cuenta desde el primer momento
+        req.session.usuarioId = result.insertId;
+
         return res.status(201).json({
             status: 'success',
             message: '¡Usuario registrado con éxito en MySQL!',
-            usuarioId: result.insertId
+            usuarioId: result.insertId,
+            usuario: {
+                id: result.insertId,
+                username,
+                email,
+                pvpasword: ''
+            }
         });
     } catch (error) {
         // Código de error de MySQL cuando se duplica una llave única (el email)
@@ -67,6 +77,10 @@ router.post('/login', async (req, res) => {
 
             // Comparamos la contraseña en texto plano
             if (usuario.password === password) {
+                // Guardamos el id del usuario en la sesion para que las rutas
+                // protegidas filtren la informacion por cuenta
+                req.session.usuarioId = usuario.id;
+
                 return res.status(200).json({
                     status: 'success',
                     message: 'Autenticación exitosa.',
@@ -93,6 +107,46 @@ router.post('/login', async (req, res) => {
             message: 'Error interno del servidor.'
         });
     }
+});
+
+// ==========================================
+// 3. RUTA PARA CONSULTAR LA SESION ACTUAL
+// ==========================================
+router.get('/me', async (req, res) => {
+    if (!req.session || !req.session.usuarioId) {
+        return res.status(401).json({ status: 'error', message: 'No hay sesión activa.' });
+    }
+
+    try {
+        const [rows] = await db.execute(
+            'SELECT id, username, email, pvpasword FROM usuarios WHERE id = ?',
+            [req.session.usuarioId]
+        );
+        if (rows.length === 0) {
+            req.session.destroy(() => {});
+            return res.status(401).json({ status: 'error', message: 'No hay sesión activa.' });
+        }
+        return res.json({ status: 'success', usuario: rows[0] });
+    } catch (error) {
+        console.error('Error al consultar la sesión:', error);
+        return res.status(500).json({ status: 'error', message: 'Error interno del servidor.' });
+    }
+});
+
+// ==========================================
+// 4. RUTA PARA CERRAR SESION
+// ==========================================
+router.post('/logout', (req, res) => {
+    if (!req.session) {
+        return res.json({ status: 'success', message: 'Sesión cerrada.' });
+    }
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).json({ status: 'error', message: 'No se pudo cerrar la sesión.' });
+        }
+        res.clearCookie('connect.sid');
+        return res.json({ status: 'success', message: 'Sesión cerrada.' });
+    });
 });
 
 module.exports = router;
